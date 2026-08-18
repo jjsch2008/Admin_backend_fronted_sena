@@ -3,63 +3,45 @@
 namespace App\Http\Controllers;
 
 use App\Models\Area;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AreaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        return response()->json(Area::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $datos = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        return response()->json(Area::create($datos), 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show(Area $area): JsonResponse
     {
-        //
+        return response()->json($area->load('teachers', 'cursos'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Area $area)
+    public function update(Request $request, Area $area): JsonResponse
     {
-        //
+        $datos = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+        ]);
+
+        $area->update($datos);
+
+        return response()->json($area);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Area $area)
+    public function destroy(Area $area): JsonResponse
     {
-        //
-    }
+        $area->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Area $area)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Area $area)
-    {
-        //
+        return response()->json(['mensaje' => 'Área eliminada correctamente']);
     }
 }

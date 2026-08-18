@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Curso extends Model
+class Teacher extends Model
 {
-    protected $fillable = ['course_number', 'day', 'area_id', 'training_center_id'];
+    protected $fillable = ['name', 'email', 'area_id', 'training_center_id'];
 
     public function area(): BelongsTo
     {
@@ -21,13 +20,8 @@ class Curso extends Model
         return $this->belongsTo(TrainingCenter::class, 'training_center_id');
     }
 
-    public function teachers(): BelongsToMany
+    public function cursos(): BelongsToMany
     {
-        return $this->belongsToMany(Teacher::class, 'course_teacher', 'course_id', 'teacher_id');
-    }
-
-    public function aprendices(): HasMany
-    {
-        return $this->hasMany(Aprendice::class);
+        return $this->belongsToMany(Curso::class, 'course_teacher', 'course_id', 'teacher_id');
     }
 }

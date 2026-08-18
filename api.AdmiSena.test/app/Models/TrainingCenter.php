@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Area extends Model
+class TrainingCenter extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'location'];
 
     public function teachers(): HasMany
     {

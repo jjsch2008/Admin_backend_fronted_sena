@@ -3,63 +3,55 @@
 namespace App\Http\Controllers;
 
 use App\Models\Curso;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CursoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        return response()->json(Curso::with('area', 'trainingCenter', 'teachers')->get());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $datos = $request->validate([
+            'course_number' => 'required|string|max:255|unique:cursos,course_number',
+            'day' => 'required|string|max:255',
+            'area_id' => 'required|integer|exists:areas,id',
+            'training_center_id' => 'required|integer|exists:training_centers,id',
+        ]);
+
+        $curso = Curso::create($datos);
+        $curso->teachers()->sync($request->input('teacher_ids', []));
+
+        return response()->json($curso->load('teachers'), 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show(Curso $curso): JsonResponse
     {
-        //
+        return response()->json($curso->load('area', 'trainingCenter', 'teachers', 'aprendices'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Curso $curso)
+    public function update(Request $request, Curso $curso): JsonResponse
     {
-        //
+        $datos = $request->validate([
+            'course_number' => 'sometimes|required|string|max:255|unique:cursos,course_number,'.$curso->id,
+            'day' => 'sometimes|required|string|max:255',
+            'area_id' => 'sometimes|required|integer|exists:areas,id',
+            'training_center_id' => 'sometimes|required|integer|exists:training_centers,id',
+        ]);
+
+        $curso->update($datos);
+        $curso->teachers()->sync($request->input('teacher_ids', []));
+
+        return response()->json($curso->load('teachers'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Curso $curso)
+    public function destroy(Curso $curso): JsonResponse
     {
-        //
-    }
+        $curso->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Curso $curso)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Curso $curso)
-    {
-        //
+        return response()->json(['mensaje' => 'Curso eliminado correctamente']);
     }
 }

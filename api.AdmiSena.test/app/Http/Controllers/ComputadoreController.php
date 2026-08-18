@@ -3,63 +3,47 @@
 namespace App\Http\Controllers;
 
 use App\Models\Computadore;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ComputadoreController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        return response()->json(Computadore::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $datos = $request->validate([
+            'marca' => 'required|string|max:255',
+            'numero' => 'required|string|max:255|unique:computadores,numero',
+        ]);
+
+        return response()->json(Computadore::create($datos), 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show(Computadore $computadore): JsonResponse
     {
-        //
+        return response()->json($computadore->load('aprendices'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Computadore $computadore)
+    public function update(Request $request, Computadore $computadore): JsonResponse
     {
-        //
+        $datos = $request->validate([
+            'marca' => 'sometimes|required|string|max:255',
+            'numero' => 'sometimes|required|string|max:255|unique:computadores,numero,'.$computadore->id,
+        ]);
+
+        $computadore->update($datos);
+
+        return response()->json($computadore);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Computadore $computadore)
+    public function destroy(Computadore $computadore): JsonResponse
     {
-        //
-    }
+        $computadore->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Computadore $computadore)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Computadore $computadore)
-    {
-        //
+        return response()->json(['mensaje' => 'Computador eliminado correctamente']);
     }
 }
